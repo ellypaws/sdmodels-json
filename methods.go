@@ -48,7 +48,7 @@ func (m *Models) ReadLoraFromFile(fileName string) {
 		//log.Println(scanner.Text())
 		lines := scanner.Text()
 		if lines != "" {
-			m.StringToLora(lines)
+			m.ParseStrings(lines, "lora")
 		}
 	}
 }
@@ -136,16 +136,7 @@ func (m *Models) ReadFromFileAndSort(fileName string) {
 			continue
 		}
 
-		switch currentSection {
-		case "loras":
-			m.StringToLora(line)
-		case "checkpoints":
-			//m.StringToCheckpoint(line)
-		case "vaes":
-			m.StringToVae(line)
-		case "schedulers", "samplers":
-			// Add cases based on suitability
-		}
+		m.ParseStrings(line, currentSection)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -153,7 +144,7 @@ func (m *Models) ReadFromFileAndSort(fileName string) {
 	}
 }
 
-func (m *Models) StringToLora(input string) {
+func (m *Models) ParseStrings(text string, option string) {
 	// example: "artist/artistLoRa.safetensors;"
 	// example: "character/HeroCharacter.ckpt;"
 	compile, err := regexp.Compile(`(?P<folder>\w+[\\/])?(?P<filename>.*)(?P<extension>\.(?:safetensors|(?:ck)?pt));?`)
@@ -161,7 +152,7 @@ func (m *Models) StringToLora(input string) {
 		return
 	}
 
-	match := compile.FindStringSubmatch(input)
+	match := compile.FindStringSubmatch(text)
 	if match == nil {
 		return
 	}
@@ -173,56 +164,16 @@ func (m *Models) StringToLora(input string) {
 		}
 	}
 
-	lora := &Lora{
-		Folder:    result["folder"],
-		Filename:  result["filename"],
-		Extension: result["extension"],
+	switch option {
+	case "loras":
+		m.Loras = append(m.Loras, &Lora{Folder: result["folder"], Filename: result["filename"], Extension: result["extension"]})
+	case "checkpoints":
+		m.Checkpoints = append(m.Checkpoints, &Checkpoint{Folder: result["folder"], Filename: result["filename"], Extension: result["extension"]})
+	case "vaes":
+		m.Vaes = append(m.Vaes, &Vae{Folder: result["folder"], Filename: result["filename"], Extension: result["extension"]})
+	case "embeddings":
+		m.Embeddings = append(m.Embeddings, &Embedding{Folder: result["folder"], Filename: result["filename"], Extension: result["extension"]})
 	}
-
-	// check if Lora is nil, use CreateLora() if it is
-	if m.Loras == nil {
-		m.CreateLora()
-	}
-	m.Loras = append(m.Loras, lora)
-
-	if lora.Filename == "" {
-		return
-	}
-
-	return
-}
-
-func (m *Models) StringToVae(input string) {
-	compile, err := regexp.Compile(`(?P<folder>\w+[\\/])?(?P<filename>.*?)(?P<extension>\.(?:ck)?pt);?`)
-	if err != nil {
-		return
-	}
-
-	match := compile.FindStringSubmatch(input)
-	if match == nil {
-		return
-	}
-
-	result := make(map[string]string)
-	for i, name := range compile.SubexpNames() {
-		if i != 0 && name != "" && i < len(match) {
-			result[name] = match[i]
-		}
-	}
-
-	vae := &Vae{
-		Folder:    result["folder"],
-		Filename:  result["filename"],
-		Extension: result["extension"],
-	}
-
-	// check if Vae is nil, use CreateVae() if it is
-	if m.Vaes == nil {
-		m.CreateVae()
-	}
-	m.Vaes = append(m.Vaes, vae)
-
-	return
 }
 
 func SaveJsonToFile(fileName string, json []byte) {
