@@ -1,22 +1,6 @@
 ____________SAMPLERS____________
 euler;
 euler_ancestral;
-heun;
-dpm_2;
-dpm_2_ancestral;
-lms;
-dpm_fast;
-dpm_adaptive;
-dpmpp_2s_ancestral;
-dpmpp_sde;
-dpmpp_sde_gpu;
-dpmpp_2m;
-dpmpp_2m_sde;
-dpmpp_2m_sde_gpu;
-dpmpp_3m_sde;
-dpmpp_3m_sde_gpu;
-ddim;
-uni_pc;
 uni_pc_bh2
 
 ___________SCHEDULERS___________
@@ -33,12 +17,11 @@ vae-ft-mse-840000-ema-pruned.ckpt
 
 ___________CHECKPOINTS__________
 modelnamewithoutfolder.ckpt;
-anime\AOM3.safetensors;
+anime\modelname.safetensors;
 kl-f8-anime2.vae.ckpt;
-realistic\768-v-ema.safetensors
+sdxl\768-v-ema.safetensors
 
 _____________LORAS______________
 lorafilenameNoFolder.safetensors;
 artist\artistname.safetensors;
 character\charactername.safetensors
-
