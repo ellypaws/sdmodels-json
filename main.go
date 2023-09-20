@@ -20,4 +20,10 @@ func main() {
 	//models.printEach()
 	models.ReadFromFileAndSort(filename)
 	models.printEach()
+	bytes, err := models.jsonEach()
+	if err != nil {
+		return
+	}
+	fmt.Println(string(bytes))
+	SaveJsonToFile("models.json", bytes)
 }
