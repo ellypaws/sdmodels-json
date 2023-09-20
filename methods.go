@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"regexp"
@@ -61,14 +62,62 @@ func (m *Models) printEach() {
 	log.Print(printModels(allModels))
 }
 
-func (m *Models) jsonEach() (byteArray []byte, err error) {
-	m.appendEach()
-	models, err := jsonModels(m)
-	if err != nil {
-		return nil, err
+func (m *Models) jsonAll() (byteArray []byte, err error) {
+	return json.MarshalIndent(m, "", "    ")
+}
+
+func (m *Models) jsonAllAndSave() error {
+	var dataTypes = map[string]any{
+		"loras":       m.Loras,
+		"checkpoints": m.Checkpoints,
+		"vaes":        m.Vaes,
+		"embeddings":  m.Embeddings,
 	}
 
-	return json.MarshalIndent(models, "", "    ")
+	for dataType, data := range dataTypes {
+		switch dataSlice := data.(type) {
+		case []*Lora:
+			for _, item := range dataSlice {
+				bytes, err := item.ToJSON()
+				if err != nil {
+					return err
+				}
+				fileName := dataType + ".json"
+				SaveJsonToFile(fileName, bytes)
+			}
+		case []*Checkpoint:
+			for _, item := range dataSlice {
+				bytes, err := item.ToJSON()
+				if err != nil {
+					return err
+				}
+				fileName := dataType + ".json"
+				SaveJsonToFile(fileName, bytes)
+			}
+		case []*Vae:
+			for _, item := range dataSlice {
+				bytes, err := item.ToJSON()
+				if err != nil {
+					return err
+				}
+				fileName := dataType + ".json"
+				SaveJsonToFile(fileName, bytes)
+			}
+		case []*Embedding:
+			for _, item := range dataSlice {
+				bytes, err := item.ToJSON()
+				if err != nil {
+					return err
+				}
+				fileName := dataType + ".json"
+				SaveJsonToFile(fileName, bytes)
+			}
+		default:
+			return errors.New("unknown datatype encountered")
+		}
+	}
+
+	return nil
 }
 
 func (m *Models) appendEach() (print []Printables) {
@@ -102,13 +151,8 @@ func printModels[T Printables](models []T) string {
 	return strings.Join(toPrint, "\n")
 }
 
-func jsonModels(models *Models) (*Models, error) {
-	return &Models{
-		Loras:       append([]*Lora(nil), models.Loras...),
-		Checkpoints: append([]*Checkpoint(nil), models.Checkpoints...),
-		Vaes:        append([]*Vae(nil), models.Vaes...),
-		Embeddings:  append([]*Embedding(nil), models.Embeddings...),
-	}, nil
+func bytesJsonModels(m *Printables) (bytes []byte, err error) {
+	return (*m).ToJSON()
 }
 
 func (m *Models) ReadFromFileAndSort(fileName string) {

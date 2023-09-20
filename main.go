@@ -7,9 +7,9 @@ import (
 
 func main() {
 	var filename string
-	// if loras.txt exists in current directory, use that
-	if _, err := os.Stat("loras.txt"); err == nil {
-		filename = "loras.txt"
+	// if models.txt exists in current directory, use that
+	if _, err := os.Stat("models.txt"); err == nil {
+		filename = "models.txt"
 	} else {
 		fmt.Print("Enter the filename: ")
 		_, _ = fmt.Scan(&filename)
@@ -20,10 +20,15 @@ func main() {
 	//models.printEach()
 	models.ReadFromFileAndSort(filename)
 	models.printEach()
-	bytes, err := models.jsonEach()
+	bytes, err := models.jsonAll()
 	if err != nil {
 		return
 	}
 	fmt.Println(string(bytes))
 	SaveJsonToFile("models.json", bytes)
+
+	err = models.jsonAllAndSave()
+	if err != nil {
+		return
+	}
 }
