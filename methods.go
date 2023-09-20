@@ -55,18 +55,7 @@ func (m *Models) ReadLoraFromFile(fileName string) {
 func (m *Models) printEach() {
 	var allModels []Printables
 
-	for _, v := range m.Loras {
-		allModels = append(allModels, v)
-	}
-	for _, v := range m.Checkpoints {
-		allModels = append(allModels, v)
-	}
-	for _, v := range m.Vaes {
-		allModels = append(allModels, v)
-	}
-	for _, v := range m.Embeddings {
-		allModels = append(allModels, v)
-	}
+	allModels = m.appendEach()
 
 	log.Print(printModels(allModels))
 }
@@ -77,6 +66,29 @@ func printModels[T Printables](models []T) string {
 		toPrint = append(toPrint, model.SPrint())
 	}
 	return strings.Join(toPrint, "\n")
+}
+
+func (m *Models) appendEach() (print []Printables) {
+	var allModels []Printables
+
+	for _, lora := range m.Loras {
+		m.Loras = append(m.Loras, lora)
+		allModels = append(allModels, lora)
+	}
+	for _, checkpoint := range m.Checkpoints {
+		m.Checkpoints = append(m.Checkpoints, checkpoint)
+		allModels = append(allModels, checkpoint)
+	}
+	for _, vae := range m.Vaes {
+		m.Vaes = append(m.Vaes, vae)
+		allModels = append(allModels, vae)
+	}
+	for _, embedding := range m.Embeddings {
+		m.Embeddings = append(m.Embeddings, embedding)
+		allModels = append(allModels, embedding)
+	}
+
+	return allModels
 }
 
 func (m *Models) ReadFromFileAndSort(fileName string) {

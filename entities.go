@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type Models struct {
 	Loras       []*Lora       `json:"loras,omitempty"`
@@ -11,12 +14,17 @@ type Models struct {
 
 type Printables interface {
 	SPrint() string
+	ToJSON() ([]byte, error)
 }
 
 type Lora struct {
 	Folder    string `json:"folder,omitempty"`
 	Filename  string `json:"filename"`
 	Extension string `json:"extension"`
+}
+
+func (l *Lora) ToJSON() ([]byte, error) {
+	return json.MarshalIndent(l, "", "    ")
 }
 
 func (l *Lora) SPrint() string {
@@ -29,6 +37,10 @@ type Checkpoint struct {
 	Extension string `json:"extension"`
 }
 
+func (c Checkpoint) ToJSON() ([]byte, error) {
+	return json.MarshalIndent(c, "", "    ")
+}
+
 func (c Checkpoint) SPrint() string {
 	return fmt.Sprintf("\n[Checkpoint]\nFolder: %s\nFilename: %s\nExtension: %s\n", c.Folder, c.Filename, c.Extension)
 }
@@ -39,6 +51,10 @@ type Vae struct {
 	Extension string `json:"extension"`
 }
 
+func (v Vae) ToJSON() ([]byte, error) {
+	return json.MarshalIndent(v, "", "    ")
+}
+
 func (v Vae) SPrint() string {
 	return fmt.Sprintf("\n[Vae]\nFolder: %s\nFilename: %s\nExtension: %s\n", v.Folder, v.Filename, v.Extension)
 }
@@ -47,6 +63,10 @@ type Embedding struct {
 	Folder    string `json:"folder,omitempty"`
 	Filename  string `json:"filename"`
 	Extension string `json:"extension"`
+}
+
+func (e Embedding) ToJSON() ([]byte, error) {
+	return json.MarshalIndent(e, "", "    ")
 }
 
 func (e Embedding) SPrint() string {
