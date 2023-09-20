@@ -12,7 +12,7 @@ To run the program, follow the steps:
 
 3. If the file is in the project directory under the name `loras.txt`, the program will use it automatically, else you will be prompted to enter the filename.
 
-   ### <img src="https://go.dev/images/icons/package.svg" width="25" alt="JSON" style="vertical-align: sub;"> [Example file](loras.example.txt)
+   ### <img src="https://go.dev/images/icons/package.svg" width="25" alt="JSON" style="vertical-align: sub;"> [Example file](models.example.txt)
    ```text
    ____________SAMPLERS____________
    euler;
