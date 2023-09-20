@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"log"
 	"os"
 	"regexp"
@@ -60,12 +61,14 @@ func (m *Models) printEach() {
 	log.Print(printModels(allModels))
 }
 
-func printModels[T Printables](models []T) string {
-	var toPrint []string
-	for _, model := range models {
-		toPrint = append(toPrint, model.SPrint())
+func (m *Models) jsonEach() (byteArray []byte, err error) {
+	m.appendEach()
+	models, err := jsonModels(m)
+	if err != nil {
+		return nil, err
 	}
-	return strings.Join(toPrint, "\n")
+
+	return json.MarshalIndent(models, "", "    ")
 }
 
 func (m *Models) appendEach() (print []Printables) {
@@ -89,6 +92,23 @@ func (m *Models) appendEach() (print []Printables) {
 	}
 
 	return allModels
+}
+
+func printModels[T Printables](models []T) string {
+	var toPrint []string
+	for _, model := range models {
+		toPrint = append(toPrint, model.SPrint())
+	}
+	return strings.Join(toPrint, "\n")
+}
+
+func jsonModels(models *Models) (*Models, error) {
+	return &Models{
+		Loras:       append([]*Lora(nil), models.Loras...),
+		Checkpoints: append([]*Checkpoint(nil), models.Checkpoints...),
+		Vaes:        append([]*Vae(nil), models.Vaes...),
+		Embeddings:  append([]*Embedding(nil), models.Embeddings...),
+	}, nil
 }
 
 func (m *Models) ReadFromFileAndSort(fileName string) {
@@ -203,4 +223,21 @@ func (m *Models) StringToVae(input string) {
 	m.Vaes = append(m.Vaes, vae)
 
 	return
+}
+
+func SaveJsonToFile(fileName string, json []byte) {
+	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(file *os.File) {
+		if closeErr := file.Close(); closeErr != nil {
+			log.Fatal(closeErr)
+		}
+	}(file)
+
+	_, err = file.Write(json)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
