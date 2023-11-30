@@ -33,6 +33,7 @@ To run the program, follow the steps:
       
    ___________CHECKPOINTS__________
    modelnamewithoutfolder.ckpt;
+   checkpoint.saftensors;
    anime\modelname.safetensors;
    kl-f8-anime2.vae.ckpt;
    sdxl\768-v-ema.safetensors
